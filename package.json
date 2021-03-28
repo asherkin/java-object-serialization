@@ -1,6 +1,6 @@
 {
   "name": "java-object-serialization",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Ergonomic java.io.Serializable parsing",
   "repository": "github:asherkin/java-object-serialization",
   "main": "lib/index.js",

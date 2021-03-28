@@ -2,6 +2,7 @@ import { getObjectClass, registerObjectClass } from "./ObjectClassMap";
 import { DataStream } from "./DataStream";
 import { ObjectInputStream } from "./ObjectInputStream";
 import { FieldDesc, ObjectFieldDesc, PrimitiveFieldDesc, TypeCode } from "./FieldDesc";
+import { decodeUtf8Buffer } from "./Utf8Decoder";
 
 const STREAM_MAGIC = 0xACED;
 const STREAM_VERSION = 5;
@@ -154,7 +155,7 @@ export class JavaObjectStream {
     }
 
     const data = this.stream.readBytes(length);
-    return String.fromCharCode(...(new Uint8Array(data)));
+    return decodeUtf8Buffer(data);
   }
 
   private readContent(type: "Object" | "Class" | "Array" | "String" | "LongString" | "Enum" | "ClassDesc" | "ProxyClassDesc" | "Reference" | "Null" | "Exception" | "Reset" | "BlockData" | "BlockDataLong") {
