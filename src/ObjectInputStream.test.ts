@@ -1,9 +1,11 @@
 import { ObjectInputStream } from "./ObjectInputStream";
 
 test("deserialize example", () => {
-  class List {
+  class List implements JavaSerializable {
     value: number = 0;
     next: List | null = null;
+
+    constructor() {}  // Explicit constructor
 
     readObject(stream: ObjectInputStream): void {
       this.value = stream.readInt();
@@ -16,7 +18,11 @@ test("deserialize example", () => {
     }
   }
 
-  ObjectInputStream.RegisterObjectClass(List, "List", "7622494193198739048");
+  // Type assertion to ensure List constructor matches JavaSerializableConstructor
+  const ListConstructor = List as JavaSerializableConstructor<List>;
+
+  ObjectInputStream.RegisterObjectClass(ListConstructor, "List", "7622494193198739048");
+
 
   const data = "rO0ABXNyAARMaXN0aciKFUAWrmgCAAJJAAV2YWx1ZUwABG5leHR0AAZMTGlzdDt4cAAAABFzcQB+AAAAAAATcHEAfgAD";
   const serialized = Buffer.from(data, "base64");

@@ -12,7 +12,7 @@ export interface JavaSerializableConstructor<T extends JavaSerializable = JavaSe
 const objectClassMap: Map<string, Map<bigint, JavaSerializableConstructor>> = new Map();
 
 export function registerObjectClass<T extends JavaSerializable>(
-  objectClass: JavaSerializableConstructor<T>,
+  objectClass: new () => T,
   className: string,
   serialVersionUid: number | string | bigint
 ) {
@@ -26,7 +26,7 @@ export function registerObjectClass<T extends JavaSerializable>(
   if (existingClass === objectClass) {
     throw new Error("object class already registered");
   }
-  classMap.set(versionUid, objectClass);
+  classMap.set(versionUid, objectClass as JavaSerializableConstructor<T>);
 }
 
 export function getObjectClass(className: string, serialVersionUid: bigint): JavaSerializableConstructor | null {
