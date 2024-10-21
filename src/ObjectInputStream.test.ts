@@ -4,6 +4,16 @@ test("deserialize example", () => {
   class List {
     value: number = 0;
     next: List | null = null;
+
+    readObject(stream: ObjectInputStream): void {
+      this.value = stream.readInt();
+      this.next = stream.readObject() as List | null;
+    }
+
+    // Optional: Implement readResolve if needed
+    readResolve(): any {
+      return this;
+    }
   }
 
   ObjectInputStream.RegisterObjectClass(List, "List", "7622494193198739048");
