@@ -1,4 +1,5 @@
 import { ObjectInputStream } from "./ObjectInputStream";
+import { JavaSerializable, JavaSerializableConstructor } from "./ObjectClassMap";
 
 test("deserialize example", () => {
   class List implements JavaSerializable {
