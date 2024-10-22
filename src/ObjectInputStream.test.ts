@@ -6,24 +6,21 @@ test("deserialize example", () => {
     value: number = 0;
     next: List | null = null;
 
-    constructor() {}  // Explicit constructor
+    constructor() {}
 
     readObject(stream: ObjectInputStream): void {
       this.value = stream.readInt();
       this.next = stream.readObject() as List | null;
     }
 
-    // Optional: Implement readResolve if needed
     readResolve(): any {
       return this;
     }
   }
 
-  // Type assertion to ensure List constructor matches JavaSerializableConstructor
   const ListConstructor = List as JavaSerializableConstructor<List>;
 
   ObjectInputStream.RegisterObjectClass(ListConstructor, "List", "7622494193198739048");
-
 
   const data = "rO0ABXNyAARMaXN0aciKFUAWrmgCAAJJAAV2YWx1ZUwABG5leHR0AAZMTGlzdDt4cAAAABFzcQB+AAAAAAATcHEAfgAD";
   const serialized = Buffer.from(data, "base64");

@@ -14,9 +14,6 @@ test("deserialize example", () => {
 });
 
 test("deserialize standard date", () => {
-
-  // JavaObjectStream.RegisterObjectClass(JavaDate, "java.util.Date", BigInt("7523967970034938905"));
-
   const data = "rO0ABXNyAA5qYXZhLnV0aWwuRGF0ZWhqgQFLWXQZAwAAeHB3CAAAAYtZ1MwAeA==";
   const serialized = Buffer.from(data, "base64");
   const stream = new JavaObjectStream(serialized);
@@ -31,20 +28,18 @@ test("deserialize example two", () => {
     value: number = 0;
     next: List | null = null;
 
-    constructor() {}  // Explicit constructor
+    constructor() {}
 
     readObject(stream: ObjectInputStream): void {
       this.value = stream.readInt();
       this.next = stream.readObject() as List | null;
     }
 
-    // Optional: Implement readResolve if needed
     readResolve(): any {
       return this;
     }
   }
 
-  // Type assertion to ensure List constructor matches JavaSerializableConstructor
   const ListConstructor = List as JavaSerializableConstructor<List>;
 
   ObjectInputStream.RegisterObjectClass(ListConstructor, "List", "7622494193198739048");
