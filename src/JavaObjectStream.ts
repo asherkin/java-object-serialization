@@ -3,6 +3,7 @@ import { DataStream } from "./DataStream";
 import { ObjectInputStream } from "./ObjectInputStream";
 import { FieldDesc, ObjectFieldDesc, PrimitiveFieldDesc, TypeCode } from "./FieldDesc";
 import { decodeUtf8Buffer } from "./Utf8Decoder";
+import { JavaDate } from "./JavaDate";
 
 const STREAM_MAGIC = 0xACED;
 const STREAM_VERSION = 5;
@@ -37,6 +38,8 @@ enum ClassDescFlags {
   BlockData = (1 << 3),
   Enum = (1 << 4),
 }
+
+registerObjectClass(JavaDate, "java.util.Date", BigInt("7523967970034938905"));
 
 interface JavaClassDescInfo {
   flags: ClassDescFlags;

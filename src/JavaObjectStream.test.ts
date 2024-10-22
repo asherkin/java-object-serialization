@@ -1,6 +1,7 @@
 import { JavaObjectStream } from "./JavaObjectStream";
-import { JavaSerializable } from "./ObjectClassMap";
+import { JavaSerializable, JavaSerializableConstructor } from "./ObjectClassMap";
 import { ObjectInputStream } from "./ObjectInputStream";
+import { JavaDate } from "./JavaDate";
 
 test("deserialize example", () => {
   const data = "rO0ABXNyAARMaXN0aciKFUAWrmgCAAJJAAV2YWx1ZUwABG5leHR0AAZMTGlzdDt4cAAAABFzcQB+AAAAAAATcHEAfgAD";
@@ -12,16 +13,36 @@ test("deserialize example", () => {
   }
 });
 
+test("deserialize standard date", () => {
+  const data = "rO0ABXNyAA5qYXZhLnV0aWwuRGF0ZWhqgQFLWXQZAwAAeHB3CAAAAYtZ1MwAeA==";
+  const serialized = Buffer.from(data, "base64");
+  const stream = new JavaObjectStream(serialized);
+  const result = stream.next();
+
+  expect(result).toBeInstanceOf(Date);
+  expect(result.getTime()).toBe(1698019200000);
+});
+
 test("deserialize example two", () => {
-  class List {
-    // In the serialized interface, commented out to simulate removal.
-    // value: number = 0;
+  class List implements JavaSerializable {
+    value: number = 0;
     next: List | null = null;
-    // Not in the serialized interface, will always have default value.
-    extra: string = "foobar";
+
+    constructor() {}
+
+    readObject(stream: ObjectInputStream): void {
+      this.value = stream.readInt();
+      this.next = stream.readObject() as List | null;
+    }
+
+    readResolve(): any {
+      return this;
+    }
   }
 
-  JavaObjectStream.RegisterObjectClass(List, "List", "7622494193198739048");
+  const ListConstructor = List as JavaSerializableConstructor<List>;
+
+  ObjectInputStream.RegisterObjectClass(ListConstructor, "List", "7622494193198739048");
 
   const data = "rO0ABXNyAARMaXN0aciKFUAWrmgCAAJJAAV2YWx1ZUwABG5leHR0AAZMTGlzdDt4cAAAABFzcQB+AAAAAAATcHEAfgAD";
   const serialized = Buffer.from(data, "base64");
