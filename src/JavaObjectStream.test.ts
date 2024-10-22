@@ -1,6 +1,7 @@
 import { JavaObjectStream } from "./JavaObjectStream";
 import { JavaSerializable, JavaSerializableConstructor } from "./ObjectClassMap";
 import { ObjectInputStream } from "./ObjectInputStream";
+import { JavaDate } from "./JavaDate";
 
 test("deserialize example", () => {
   const data = "rO0ABXNyAARMaXN0aciKFUAWrmgCAAJJAAV2YWx1ZUwABG5leHR0AAZMTGlzdDt4cAAAABFzcQB+AAAAAAATcHEAfgAD";
@@ -10,6 +11,19 @@ test("deserialize example", () => {
   for (const content of stream.read()) {
     // console.log(content);
   }
+});
+
+test("deserialize standard date", () => {
+
+  // JavaObjectStream.RegisterObjectClass(JavaDate, "java.util.Date", BigInt("7523967970034938905"));
+
+  const data = "rO0ABXNyAA5qYXZhLnV0aWwuRGF0ZWhqgQFLWXQZAwAAeHB3CAAAAYtZ1MwAeA==";
+  const serialized = Buffer.from(data, "base64");
+  const stream = new JavaObjectStream(serialized);
+  const result = stream.next();
+
+  expect(result).toBeInstanceOf(Date);
+  expect(result.getTime()).toBe(1698019200000);
 });
 
 test("deserialize example two", () => {

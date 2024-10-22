@@ -44,3 +44,16 @@ test("deserialize example", () => {
   // console.log(listOne);
   // console.log(listTwo);
 });
+
+test("deserialize standard date", () => {
+
+  const data = "rO0ABXNyAA5qYXZhLnV0aWwuRGF0ZWhqgQFLWXQZAwAAeHB3CAAAAYtZ1MwAeA==";
+  const serialized = Buffer.from(data, "base64");
+  const stream = new ObjectInputStream(serialized);
+  const result = stream.readObject();
+
+  expect(result).toBeInstanceOf(Date);
+  expect(result.getTime()).toBe(1698019200000);
+});
+
+

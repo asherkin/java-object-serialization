@@ -3,6 +3,7 @@ import { DataStream } from "./DataStream";
 import { ObjectInputStream } from "./ObjectInputStream";
 import { FieldDesc, ObjectFieldDesc, PrimitiveFieldDesc, TypeCode } from "./FieldDesc";
 import { decodeUtf8Buffer } from "./Utf8Decoder";
+import { JavaDate } from "./JavaDate";
 
 const STREAM_MAGIC = 0xACED;
 const STREAM_VERSION = 5;
@@ -37,6 +38,8 @@ enum ClassDescFlags {
   BlockData = (1 << 3),
   Enum = (1 << 4),
 }
+
+registerObjectClass(JavaDate, "java.util.Date", BigInt("7523967970034938905"));
 
 interface JavaClassDescInfo {
   flags: ClassDescFlags;
@@ -391,18 +394,6 @@ export class JavaObjectStream {
 
     const newHandle = this.newHandle<any>();
 
-    console.log(classDesc.className);
-    console.log(classDesc.serialVersionUid);
-    console.log(classDesc.fields);
-    console.log(classDesc.className);
-
-    // Add this block to handle Date objects
-    if (classDesc.className === "java.util.Date") {
-      const milliseconds = this.stream.readUint64(); // Read the long value
-      newHandle.object = new Date(Number(milliseconds)); // Create a JavaScript Date object
-      return newHandle;
-    }
-
     const objectClass = getObjectClass(classDesc.className, classDesc.serialVersionUid);
     const newObject = objectClass ? new objectClass() : new JavaObject(classDesc);
 
@@ -436,24 +427,6 @@ export class JavaObjectStream {
             if (fieldName in newObject) {
               // @ts-ignore
               newObject[fieldName] = value;
-            }
-          }
-        }
-
-        // Special handling for Date objects
-        if (dataClassDesc.className === "java.util.Date" && newObject instanceof JavaObject) {
-          for (const [fieldName, value] of newObject.fields) {
-            if (typeof value === "bigint" || typeof value === "number") {
-              try {
-                const dateValue = new Date(Number(value));
-                if (!isNaN(dateValue.getTime())) {
-                  newObject.fields.set(fieldName, dateValue);
-                  break;
-                }
-              } catch (e) {
-                // If date creation fails, continue to the next field
-                console.warn(`Failed to create Date from field ${fieldName}: ${e}`);
-              }
             }
           }
         }
