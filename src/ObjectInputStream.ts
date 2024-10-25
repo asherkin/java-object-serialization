@@ -78,7 +78,6 @@ export class ObjectInputStream {
 
     for (const [fieldName, value] of values) {
       if (fieldName in this.currentObject) {
-        // @ts-ignore
         this.currentObject[fieldName] = value;
       }
     }

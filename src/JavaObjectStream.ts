@@ -422,7 +422,6 @@ export class JavaObjectStream {
             newObject.fields.set(fieldName, value);
           } else {
             if (fieldName in newObject) {
-              // @ts-ignore
               newObject[fieldName] = value;
             }
           }

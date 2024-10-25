@@ -1,8 +1,8 @@
 import { ObjectInputStream } from "./ObjectInputStream";
 
 export interface JavaSerializable {
+  [fieldName: string]: any
   readObject?(stream: ObjectInputStream): void
-
   readResolve?(): any
 }
 
@@ -12,7 +12,7 @@ export interface JavaSerializableConstructor<T extends JavaSerializable = JavaSe
 
 const objectClassMap: Map<string, Map<bigint, JavaSerializableConstructor>> = new Map();
 
-export function registerObjectClass<T>(objectClass: JavaSerializableConstructor<T>, className: string, serialVersionUid: number | string | bigint) {
+export function registerObjectClass<T extends JavaSerializable>(objectClass: JavaSerializableConstructor<T>, className: string, serialVersionUid: number | string | bigint) {
   let classMap = objectClassMap.get(className);
 
   if (!classMap) {
