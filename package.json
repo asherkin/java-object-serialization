@@ -25,6 +25,11 @@
   "jest": {
     "preset": "ts-jest",
     "testEnvironment": "node",
-    "rootDir": "src"
+    "rootDir": "src",
+    "coverageDirectory": "../coverage",
+    "collectCoverageFrom": [
+      "**/*.ts",
+      "!index.ts"
+    ]
   }
 }

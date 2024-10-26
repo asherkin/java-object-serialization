@@ -1,4 +1,4 @@
-import { JavaObjectStream } from "./JavaObjectStream";
+import { JavaObject, JavaObjectStream } from "./JavaObjectStream";
 import { JavaSerializable } from "./ObjectClassMap";
 import { ObjectInputStream } from "./ObjectInputStream";
 
@@ -7,9 +7,12 @@ test("deserialize example", () => {
   const serialized = Buffer.from(data, "base64");
   const stream = new JavaObjectStream(serialized);
 
-  for (const content of stream.read()) {
-    // console.log(content);
-  }
+  const objects = Array.from(stream.read());
+  expect(objects).toHaveLength(2);
+  expect(objects[0]).toBeInstanceOf(JavaObject);
+  expect(objects[0].className).toBe("List");
+  expect(objects[0].fields.size).toBe(2);
+  expect(objects[0].fields.get("value")).toBe(17);
 });
 
 test("deserialize example two", () => {
@@ -27,9 +30,11 @@ test("deserialize example two", () => {
   const serialized = Buffer.from(data, "base64");
   const stream = new JavaObjectStream(serialized);
 
-  for (const content of stream.read()) {
-    // console.log(content);
-  }
+  const objects = Array.from(stream.read());
+  expect(objects).toHaveLength(2);
+  expect(objects[0]).toBeInstanceOf(List);
+  expect(objects[0].next).toBe(objects[1]);
+  expect(objects[0].extra).toBe("foobar");
 });
 
 test("deserialize inherited field", () => {
@@ -74,6 +79,9 @@ test("deserialize ArrayList", () => {
     }
   }
 
+  const arrayListReadObjectSpy = jest.spyOn(ArrayList.prototype, "readObject");
+  const arrayListReadResolveSpy = jest.spyOn(ArrayList.prototype, "readResolve");
+
   JavaObjectStream.RegisterObjectClass(ArrayList, "java.util.ArrayList", "8683452581122892189");
 
   class JavaInteger implements JavaSerializable {
@@ -84,6 +92,8 @@ test("deserialize ArrayList", () => {
     }
   }
 
+  const javaIntegerReadResolveSpy = jest.spyOn(JavaInteger.prototype, "readResolve");
+
   JavaObjectStream.RegisterObjectClass(JavaInteger, "java.lang.Integer", "1360826667806852920");
 
   const data = "rO0ABXVyABNbTGphdmEubGFuZy5PYmplY3Q7kM5YnxBzKWwCAAB4cAAAAAJ0AAVCZWdpbnEAfgABc3IAE2phdmEudXRpbC5BcnJheUxpc3R4gdIdmcdhnQMAAUkABHNpemV4cAAAAAJ3BAAAAAJ0AANmb29zcgARamF2YS5sYW5nLkludGVnZXIS4qCk94GHOAIAAUkABXZhbHVleHIAEGphdmEubGFuZy5OdW1iZXKGrJUdC5TgiwIAAHhwAAAAe3h1cQB+AAAAAAACcQB+AAl0AANFbmQ=";
@@ -93,6 +103,11 @@ test("deserialize ArrayList", () => {
   for (const content of stream.read()) {
     // console.log(content);
   }
+
+  expect(arrayListReadObjectSpy).toHaveBeenCalledTimes(1);
+  expect(arrayListReadResolveSpy).toHaveBeenCalledTimes(1);
+  expect(javaIntegerReadResolveSpy).toHaveBeenCalledTimes(1);
+  expect(javaIntegerReadResolveSpy).toHaveReturnedWith(123);
 });
 
 test("deserialize primitive array", () => {

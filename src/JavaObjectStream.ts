@@ -55,7 +55,7 @@ interface JavaEnum {
   enumConstantName: string,
 }
 
-class JavaObject {
+export class JavaObject {
   readonly className: string;
   readonly serialVersionUid: bigint;
   readonly fields: Map<string, any> = new Map();
